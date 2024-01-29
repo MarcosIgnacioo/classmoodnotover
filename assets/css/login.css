@@ -1,0 +1,73 @@
+@font-face {
+    font-family: 'PUX';
+    src: url('../fonts/PersonifiedUXRegular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'EW';
+    src: url('../fonts/earwig_factory_rg.otf') format('truetype');
+}
+*{
+    box-sizing: border-box;
+    text-wrap:pretty;
+    font-size: 62.5%;
+}
+
+html{
+    color:snow;
+    font-family: 'PUX', Arial;
+    background-color: #0d0d0d;
+}
+
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+form {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+form *{
+    margin-top: 5%;
+}
+
+h1{
+    font-family: 'EW';
+    font-weight: 500;
+    font-size: 9rem;
+    text-align: center;
+}
+
+
+label {
+    font-size: 3rem;
+}
+
+input {
+    font-size: 2rem;
+    color: #0d0d0d;
+    font-family: 'PUX', Arial;
+    border-radius: 5px;
+    border: none;
+    height: 30px;
+}
+button{
+    font-size: 6rem;
+    color: snow;
+    font-family: 'EW', Arial;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    width: fit-content;
+}
+
+button:hover, button:active{
+    color: #d92323;
+}
