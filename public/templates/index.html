@@ -1,18 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <title></title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="../assets/css/login.css" rel="stylesheet">
-</head>
+{{ template "Header.html" . }}
 
 <body>
-    <form method="POST">
+    <form hx-post="/LogIn">
         <h1>ASS Eater</h1>
         <label for="username">Phantom codename:</label>
-        <input type="" name="username" value="" placeholder="sumbitch">
+        <input type="" name="username" value="sumbitch" placeholder="sumbitch">
         <label for="password">Password:</label>
         <input type="password" name="password" value="">
         <button type="">Enter </button>

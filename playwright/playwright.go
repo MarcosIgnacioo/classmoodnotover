@@ -6,29 +6,10 @@ import (
 	"log"
 )
 
-func FuckAround() {
-	// TODO: Separar classroom y mooodle por funciones diferentes
-	// TODO: Crear un package con variables globales (Expect)
-	// TODO: Meter ambas cosas en go routines
-	// TODO: Se podra hacer en HTMX?
-	username := "marcosignc_21"
-	password := "sopitasprecio"
-	pw, err := playwright.Run()
-	if err != nil {
-		log.Fatalf("could not start playwright: %v", err)
-	}
-	// playwright.BrowserTypeLaunchOptions{Headless: playwright.Bool(false)}
-	//                                vv
-	browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{Headless: playwright.Bool(false)})
-	if err != nil {
-		log.Fatalf("could not launch browser: %v", err)
-	}
-	page, err := browser.NewPage()
-	if err != nil {
-		log.Fatalf("could not create page: %v", err)
-	}
+var expect = playwright.NewPlaywrightAssertions(10000)
 
-	classroom, err := browser.NewPage()
+func ClassroomScrap(browser *playwright.Browser, username string, password string) []playwright.Locator {
+	classroom, err := (*browser).NewPage()
 	if err != nil {
 		log.Fatalf("could not create page: %v", err)
 	}
@@ -40,45 +21,70 @@ func FuckAround() {
 	classroom.Locator("#password").Fill(password)
 	classroom.Locator("input").Nth(2).Click()
 
-	expect := playwright.NewPlaywrightAssertions(10000)
 	expect.Locator(classroom.Locator("ol > li").Last()).ToBeVisible()
 
 	classroomAssigments, _ := classroom.Locator("ol > li").All()
-	for _, cA := range classroomAssigments {
-		fmt.Println(cA.Locator("h2 > a > div").First().InnerText())
+	return classroomAssigments
+}
+
+func MoodleScrap(browser *playwright.Browser, username string, password string, ms chan []playwright.Locator) {
+	moodle, err := (*browser).NewPage()
+
+	if err != nil {
+		log.Fatalf("could not create moodle: %v", err)
 	}
 
-	if _, err = page.Goto("https://enlinea2023-2.uabcs.mx/login/"); err != nil {
+	if _, err = moodle.Goto("https://enlinea2024-1.uabcs.mx/login/"); err != nil {
 		log.Fatalf("could not goto: %v", err)
 	}
-	page.Locator("#username").Fill(username)
-	page.Locator("#password").Fill(password)
-	page.Locator("#loginbtn").Click()
+	moodle.Locator("#username").Fill(username)
+	moodle.Locator("#password").Fill(password)
+	moodle.Locator("#loginbtn").Click()
 
-	expect.Locator(page.Locator(".multiline")).ToBeVisible()
+	expect.Locator(moodle.Locator(".multiline")).ToBeVisible()
 
-	subjects, _ := page.Locator(".multiline").All()
+	subjects, _ := moodle.Locator(".multiline").All()
 
 	for _, s := range subjects {
 		fmt.Println(s.TextContent())
 	}
-	// page.Screenshot(playwright.PageScreenshotOptions{Path: playwright.String(fmt.Sprintf("%vpopo.png", rand.Intn(150)))})
+	ms <- subjects
+}
 
-	// entries, err := page.Locator(".athing").All()
-	// if err != nil {
-	// 	log.Fatalf("could not get entries: %v", err)
-	// }
-	// for i, entry := range entries {
-	// 	title, err := entry.Locator("td.title > span > a").TextContent()
-	// 	if err != nil {
-	// 		log.Fatalf("could not get text content: %v", err)
-	// 	}
-	// 	fmt.Printf("%d: %s\n", i+1, title)
-	// }
-	// if err = browser.Close(); err != nil {
-	// 	log.Fatalf("could not close browser: %v", err)
-	// }
-	// if err = pw.Stop(); err != nil {
-	// 	log.Fatalf("could not stop Playwright: %v", err)
-	// }
+func FuckAround(username string, password string) {
+	// TODO: Crear un package con variables globales (Expect)
+	pw, err := playwright.Run()
+	if err != nil {
+		log.Fatalf("could not start playwright: %v", err)
+	}
+	// playwright.BrowserTypeLaunchOptions{Headless: playwright.Bool(false)}
+	//                                vv
+	browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{Headless: playwright.Bool(false)})
+
+	if err != nil {
+		log.Fatalf("could not launch browser: %v", err)
+	}
+
+	ms := make(chan []playwright.Locator)
+	var result []playwright.Locator
+	go MoodleScrap(&browser, username, password, ms)
+	cs := ClassroomScrap(&browser, username, password)
+
+	result = <-ms
+
+	fmt.Println("desde go channel")
+	for _, v := range result {
+		fmt.Println(v.TextContent())
+	}
+
+	for _, v := range cs {
+		fmt.Println(v.Locator("h2 > a > div").First().InnerText())
+	}
+
+	if err = browser.Close(); err != nil {
+		log.Fatalf("could not close browser: %v", err)
+	}
+	if err = pw.Stop(); err != nil {
+		log.Fatalf("could not stop Playwright: %v", err)
+	}
 }
