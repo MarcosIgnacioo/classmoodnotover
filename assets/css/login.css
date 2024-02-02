@@ -13,13 +13,20 @@
     font-size: 62.5%;
 }
 
+.spotlight{
+    --spotPos: 45%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: radial-gradient(circle at var(--spotPos), transparent 40%, rgba(0,0,0,0.30) 45%);
+     animation: spotLightAnimation 0.5s infinite; 
+}
 html{
     color:snow;
     font-family: 'PUX', Arial;
-    /* background: radial-gradient(circle, #a20028, #870526); */
-    mask: linear-gradient(#fff,#fff)50% 0 / 100% 8px;
-    background: radial-gradient(circle 500px at 50% 50%, hsl(0 0% 100% / 0.15), transparent 20vw),
-    hsl(0, 0%, 6%);
+    background: hsl(0, 0%, 6%);
 }
 
 body{
@@ -73,4 +80,12 @@ button{
 
 button:hover, button:active{
     color: #DB3754;
+}
+@keyframes spotLightAnimation{
+0%, 100% {
+    background-image: radial-gradient(circle at 45%, transparent 40%, rgba(0,0,0,0.30) 45%);
+}
+50% {
+    background-image: radial-gradient(circle at 50%, transparent 40%, rgba(0,0,0,0.30) 45%);
+}
 }
