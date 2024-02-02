@@ -16,7 +16,10 @@
 html{
     color:snow;
     font-family: 'PUX', Arial;
-    background-color: #0d0d0d;
+    /* background: radial-gradient(circle, #a20028, #870526); */
+    mask: linear-gradient(#fff,#fff)50% 0 / 100% 8px;
+    background: radial-gradient(circle 500px at 50% 50%, hsl(0 0% 100% / 0.15), transparent 20vw),
+    hsl(0, 0%, 6%);
 }
 
 body{
@@ -69,5 +72,5 @@ button{
 }
 
 button:hover, button:active{
-    color: #d92323;
+    color: #DB3754;
 }

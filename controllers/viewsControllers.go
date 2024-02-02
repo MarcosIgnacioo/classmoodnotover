@@ -16,7 +16,8 @@ func LogIn(c *gin.Context) {
 func LogInPost(c *gin.Context) {
 	user := c.PostForm("username")
 	password := c.PostForm("password")
-	pw.FuckAround(user, password)
+	ScrappedInfo := pw.FuckAround(user, password)
+	c.HTML(http.StatusOK, "assigments.html", ScrappedInfo)
 }
 func Test(c *gin.Context) {
 	c.HTML(http.StatusOK, "test.html", nil)

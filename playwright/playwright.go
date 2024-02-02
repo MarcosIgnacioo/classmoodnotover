@@ -2,8 +2,10 @@ package pw
 
 import (
 	"fmt"
-	"github.com/playwright-community/playwright-go"
 	"log"
+
+	"github.com/MarcosIgnacioo/classmoodls/helpers/arraylist"
+	"github.com/playwright-community/playwright-go"
 )
 
 var expect = playwright.NewPlaywrightAssertions(10000)
@@ -51,7 +53,19 @@ func MoodleScrap(browser *playwright.Browser, username string, password string, 
 	ms <- subjects
 }
 
-func FuckAround(username string, password string) {
+type ScrappedInfo struct {
+	Moodle    []interface{}
+	ClassRoom []interface{}
+}
+
+func NewScrappedInfo(md []interface{}, cr []interface{}) ScrappedInfo {
+	return ScrappedInfo{
+		Moodle:    md,
+		ClassRoom: cr,
+	}
+}
+
+func FuckAround(username string, password string) ScrappedInfo {
 	// TODO: Crear un package con variables globales (Expect)
 	pw, err := playwright.Run()
 	if err != nil {
@@ -73,12 +87,18 @@ func FuckAround(username string, password string) {
 	result = <-ms
 
 	fmt.Println("desde go channel")
+
+	moodleArray := arraylist.NewArrayList(10)
+	classroomArray := arraylist.NewArrayList(10)
+
 	for _, v := range result {
-		fmt.Println(v.TextContent())
+		hw, _ := v.TextContent()
+		moodleArray.Push(hw)
 	}
 
 	for _, v := range cs {
-		fmt.Println(v.Locator("h2 > a > div").First().InnerText())
+		hw, _ := v.Locator("h2 > a > div").First().InnerText()
+		classroomArray.Push(hw)
 	}
 
 	if err = browser.Close(); err != nil {
@@ -87,4 +107,7 @@ func FuckAround(username string, password string) {
 	if err = pw.Stop(); err != nil {
 		log.Fatalf("could not stop Playwright: %v", err)
 	}
+	mArr := moodleArray.ArrayList[0:moodleArray.Length]
+	cArr := classroomArray.ArrayList[0:classroomArray.Length]
+	return NewScrappedInfo(mArr, cArr)
 }
