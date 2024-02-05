@@ -15,14 +15,13 @@ func ClassroomScrap(browser *playwright.Browser, username string, password strin
 	if err != nil {
 		log.Fatalf("could not create page: %v", err)
 	}
-
+	fmt.Println("aqui")
 	classroom.Goto("https://accounts.google.com/ServiceLogin?continue=https%3A%2F%2Fclassroom.google.com&passive=true")
 	classroom.Locator("#identifierId").Fill(fmt.Sprintf("%v@alu.uabcs.mx", username))
-	classroom.Locator("button").Nth(2).Click()
+	classroom.Locator("button").First().Click()
 	classroom.Locator("#username").Fill(username)
 	classroom.Locator("#password").Fill(password)
 	classroom.Locator("input").Nth(2).Click()
-
 	expect.Locator(classroom.Locator("ol > li").Last()).ToBeVisible()
 
 	classroomAssigments, _ := classroom.Locator("ol > li").All()
@@ -46,6 +45,7 @@ func MoodleScrap(browser *playwright.Browser, username string, password string, 
 	expect.Locator(moodle.Locator(".multiline")).ToBeVisible()
 
 	subjects, _ := moodle.Locator(".multiline").All()
+	fmt.Println("moodle:", subjects)
 
 	for _, s := range subjects {
 		fmt.Println(s.TextContent())
@@ -73,11 +73,13 @@ func FuckAround(username string, password string) ScrappedInfo {
 	}
 	// playwright.BrowserTypeLaunchOptions{Headless: playwright.Bool(false)}
 	//                                vv
-	browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{Headless: playwright.Bool(false)})
+	browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{Headless: playwright.Bool(true)})
+	fmt.Println("wtf")
 
 	if err != nil {
 		log.Fatalf("could not launch browser: %v", err)
 	}
+	fmt.Println("quwepedo")
 
 	ms := make(chan []playwright.Locator)
 	var result []playwright.Locator
@@ -110,4 +112,38 @@ func FuckAround(username string, password string) ScrappedInfo {
 	mArr := moodleArray.ArrayList[0:moodleArray.Length]
 	cArr := classroomArray.ArrayList[0:classroomArray.Length]
 	return NewScrappedInfo(mArr, cArr)
+}
+func Test() {
+	pw, err := playwright.Run()
+	if err != nil {
+		log.Fatalf("could not start playwright: %v", err)
+	}
+	browser, err := pw.Chromium.Launch()
+	if err != nil {
+		log.Fatalf("could not launch browser: %v", err)
+	}
+	page, err := browser.NewPage()
+	if err != nil {
+		log.Fatalf("could not create page: %v", err)
+	}
+	if _, err = page.Goto("https://news.ycombinator.com"); err != nil {
+		log.Fatalf("could not goto: %v", err)
+	}
+	entries, err := page.Locator(".athing").All()
+	if err != nil {
+		log.Fatalf("could not get entries: %v", err)
+	}
+	for i, entry := range entries {
+		title, err := entry.Locator("td.title > span > a").TextContent()
+		if err != nil {
+			log.Fatalf("could not get text content: %v", err)
+		}
+		fmt.Printf("%d: %s\n", i+1, title)
+	}
+	if err = browser.Close(); err != nil {
+		log.Fatalf("could not close browser: %v", err)
+	}
+	if err = pw.Stop(); err != nil {
+		log.Fatalf("could not stop Playwright: %v", err)
+	}
 }

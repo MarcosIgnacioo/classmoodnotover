@@ -4,16 +4,16 @@
 {{ template "Header.html" . }}
 
 <body>
-    <form hx-post="/LogIn" hx-swap="outerHTML">
+    <form method="POST" hx-post="/LogIn" hx-swap="outerHTML">
         <h1>ASS Eater</h1>
         <label for="username">Phantom codename:</label>
         <input type="" name="username" value="marcosignc_21" placeholder="sumbitch">
         <label for="password">Password:</label>
         <input type="password" name="password" value="sopitasprecio">
         <button type="">Enter </button>
+        <div class="spotlight">
+        </div>
     </form>
-    <div class="spotlight">
-    </div>
 </body>
 
 </html>

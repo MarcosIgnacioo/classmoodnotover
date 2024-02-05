@@ -19,6 +19,8 @@ func LogInPost(c *gin.Context) {
 	ScrappedInfo := pw.FuckAround(user, password)
 	c.HTML(http.StatusOK, "assigments.html", ScrappedInfo)
 }
+
 func Test(c *gin.Context) {
+	pw.Test()
 	c.HTML(http.StatusOK, "test.html", nil)
 }
