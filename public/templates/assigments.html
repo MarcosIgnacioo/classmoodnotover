@@ -6,4 +6,9 @@
     </div>
     {{ end }}
     <h1>Moodle desires</h1>
+    {{ range .Moodle}}
+    <div class="assigment">
+        <label for=""> {{ . }} </label>
+    </div>
+    {{ end }}
 </div>

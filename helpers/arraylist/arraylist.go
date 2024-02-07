@@ -30,6 +30,10 @@ func NewArrayList(c uint) ArrayList {
 	}
 }
 
+func (al *ArrayList) GetArray() []interface{} {
+	return (*al).ArrayList[0:al.Length]
+}
+
 func (arrayList *ArrayList) Enqueue(item interface{}) interface{} {
 
 	if arrayList.Type == nil {

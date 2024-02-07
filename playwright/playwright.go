@@ -1,6 +1,7 @@
 package pw
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -10,12 +11,11 @@ import (
 
 var expect = playwright.NewPlaywrightAssertions(10000)
 
-func ClassroomScrap(browser *playwright.Browser, username string, password string) []playwright.Locator {
+func ClassroomScrap(browser *playwright.Browser, username string, password string, cs chan []playwright.Locator) {
 	classroom, err := (*browser).NewPage()
 	if err != nil {
 		log.Fatalf("could not create page: %v", err)
 	}
-	fmt.Println("aqui")
 	classroom.Goto("https://accounts.google.com/ServiceLogin?continue=https%3A%2F%2Fclassroom.google.com&passive=true")
 	classroom.Locator("#identifierId").Fill(fmt.Sprintf("%v@alu.uabcs.mx", username))
 	classroom.Locator("button").First().Click()
@@ -23,12 +23,11 @@ func ClassroomScrap(browser *playwright.Browser, username string, password strin
 	classroom.Locator("#password").Fill(password)
 	classroom.Locator("input").Nth(2).Click()
 	expect.Locator(classroom.Locator("ol > li").Last()).ToBeVisible()
-
 	classroomAssigments, _ := classroom.Locator("ol > li").All()
-	return classroomAssigments
+	cs <- classroomAssigments
 }
 
-func MoodleScrap(browser *playwright.Browser, username string, password string, ms chan []playwright.Locator) {
+func MoodleScrap(browser *playwright.Browser, username string, password string) ([]interface{}, error) {
 	moodle, err := (*browser).NewPage()
 
 	if err != nil {
@@ -41,16 +40,36 @@ func MoodleScrap(browser *playwright.Browser, username string, password string, 
 	moodle.Locator("#username").Fill(username)
 	moodle.Locator("#password").Fill(password)
 	moodle.Locator("#loginbtn").Click()
+	url := moodle.URL()
+	if url != "https://enlinea2024-1.uabcs.mx/my/" {
+		err := errors.New("Credenciales incorrectas")
+		return nil, err
+	}
 
 	expect.Locator(moodle.Locator(".multiline")).ToBeVisible()
-
-	subjects, _ := moodle.Locator(".multiline").All()
-	fmt.Println("moodle:", subjects)
-
-	for _, s := range subjects {
-		fmt.Println(s.TextContent())
+	tabContent, _ := moodle.Locator(".event-name-container a").All()
+	subjects := arraylist.NewArrayList(10)
+	for _, v := range tabContent {
+		assigmentTitle, assError := v.InnerText()
+		if assError != nil {
+			assigmentTitle = "No hay titulo"
+		}
+		link, linkErr := v.GetAttribute("href")
+		if linkErr != nil {
+			link = "No hay link"
+		}
+		subjects.Push(NewAssigment(assigmentTitle, link))
 	}
-	ms <- subjects
+	return subjects.GetArray(), nil
+}
+
+type Assigment struct {
+	Title string
+	Link  string
+}
+
+func NewAssigment(t string, l string) Assigment {
+	return Assigment{Title: t, Link: l}
 }
 
 type ScrappedInfo struct {
@@ -58,14 +77,14 @@ type ScrappedInfo struct {
 	ClassRoom []interface{}
 }
 
-func NewScrappedInfo(md []interface{}, cr []interface{}) ScrappedInfo {
-	return ScrappedInfo{
+func NewScrappedInfo(md []interface{}, cr []interface{}) *ScrappedInfo {
+	return &ScrappedInfo{
 		Moodle:    md,
 		ClassRoom: cr,
 	}
 }
 
-func FuckAround(username string, password string) ScrappedInfo {
+func FuckAround(username string, password string) (*ScrappedInfo, error) {
 	// TODO: Crear un package con variables globales (Expect)
 	pw, err := playwright.Run()
 	if err != nil {
@@ -74,44 +93,39 @@ func FuckAround(username string, password string) ScrappedInfo {
 	// playwright.BrowserTypeLaunchOptions{Headless: playwright.Bool(false)}
 	//                                vv
 	browser, err := pw.Chromium.Launch(playwright.BrowserTypeLaunchOptions{Headless: playwright.Bool(true)})
-	fmt.Println("wtf")
 
 	if err != nil {
 		log.Fatalf("could not launch browser: %v", err)
 	}
-	fmt.Println("quwepedo")
 
-	ms := make(chan []playwright.Locator)
-	var result []playwright.Locator
-	go MoodleScrap(&browser, username, password, ms)
-	cs := ClassroomScrap(&browser, username, password)
+	cs := make(chan []playwright.Locator)
 
-	result = <-ms
+	go ClassroomScrap(&browser, username, password, cs)
+	ms, logErr := MoodleScrap(&browser, username, password)
 
-	fmt.Println("desde go channel")
+	if logErr != nil {
+		return nil, err
+	}
 
 	moodleArray := arraylist.NewArrayList(10)
 	classroomArray := arraylist.NewArrayList(10)
-
-	for _, v := range result {
-		hw, _ := v.TextContent()
-		moodleArray.Push(hw)
-	}
-
-	for _, v := range cs {
+	prueba := <-cs
+	for _, v := range prueba {
 		hw, _ := v.Locator("h2 > a > div").First().InnerText()
 		classroomArray.Push(hw)
 	}
-
+	for _, v := range ms {
+		moodleArray.Push(v)
+	}
 	if err = browser.Close(); err != nil {
 		log.Fatalf("could not close browser: %v", err)
 	}
 	if err = pw.Stop(); err != nil {
 		log.Fatalf("could not stop Playwright: %v", err)
 	}
-	mArr := moodleArray.ArrayList[0:moodleArray.Length]
-	cArr := classroomArray.ArrayList[0:classroomArray.Length]
-	return NewScrappedInfo(mArr, cArr)
+	mArr := moodleArray.GetArray()
+	cArr := classroomArray.GetArray()
+	return NewScrappedInfo(mArr, cArr), nil
 }
 func Test() {
 	pw, err := playwright.Run()
