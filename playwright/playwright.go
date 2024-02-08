@@ -47,34 +47,46 @@ func MoodleScrap(browser *playwright.Browser, username string, password string) 
 	}
 
 	expect.Locator(moodle.Locator(".multiline")).ToBeVisible()
-	tabContent, _ := moodle.Locator(".event-name-container a").All()
+	tabContent, _ := moodle.Locator(".event-name-container").All()
+
 	subjects := arraylist.NewArrayList(10)
 	for _, v := range tabContent {
-		assigmentTitle, assError := v.InnerText()
+		classSubject, _ := v.Locator("small").InnerText()
+		anchorTag := v.Locator("a").First()
+		assigmentTitle, assError := anchorTag.InnerText()
 		if assError != nil {
 			assigmentTitle = "No hay titulo"
 		}
-		link, linkErr := v.GetAttribute("href")
+		link, linkErr := anchorTag.GetAttribute("href")
 		if linkErr != nil {
 			link = "No hay link"
 		}
-		subjects.Push(NewAssigment(assigmentTitle, link))
+		subjects.Push(NewAssigment(classSubject, assigmentTitle, link))
 	}
 	return subjects.GetArray(), nil
 }
 
 type Assigment struct {
-	Title string
-	Link  string
+	ClassSubject string
+	Title        string
+	Link         string
 }
 
-func NewAssigment(t string, l string) Assigment {
-	return Assigment{Title: t, Link: l}
+func NewAssigment(c string, t string, l string) Assigment {
+	return Assigment{ClassSubject: c, Title: t, Link: l}
 }
 
 type ScrappedInfo struct {
 	Moodle    []interface{}
 	ClassRoom []interface{}
+}
+
+type LoginError struct {
+	ErrorMessage string
+}
+
+func NewLoginError(m string) *LoginError {
+	return &LoginError{ErrorMessage: m}
 }
 
 func NewScrappedInfo(md []interface{}, cr []interface{}) *ScrappedInfo {
@@ -84,7 +96,7 @@ func NewScrappedInfo(md []interface{}, cr []interface{}) *ScrappedInfo {
 	}
 }
 
-func FuckAround(username string, password string) (*ScrappedInfo, error) {
+func FuckAround(username string, password string) (*ScrappedInfo, *LoginError) {
 	// TODO: Crear un package con variables globales (Expect)
 	pw, err := playwright.Run()
 	if err != nil {
@@ -104,7 +116,13 @@ func FuckAround(username string, password string) (*ScrappedInfo, error) {
 	ms, logErr := MoodleScrap(&browser, username, password)
 
 	if logErr != nil {
-		return nil, err
+		if err = browser.Close(); err != nil {
+			log.Fatalf("could not close browser: %v", err)
+		}
+		if err = pw.Stop(); err != nil {
+			log.Fatalf("could not stop Playwright: %v", err)
+		}
+		return nil, NewLoginError(logErr.Error())
 	}
 
 	moodleArray := arraylist.NewArrayList(10)
@@ -125,8 +143,11 @@ func FuckAround(username string, password string) (*ScrappedInfo, error) {
 	}
 	mArr := moodleArray.GetArray()
 	cArr := classroomArray.GetArray()
+	fmt.Println(mArr...)
+	fmt.Println(cArr...)
 	return NewScrappedInfo(mArr, cArr), nil
 }
+
 func Test() {
 	pw, err := playwright.Run()
 	if err != nil {

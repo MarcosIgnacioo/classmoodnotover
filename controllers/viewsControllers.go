@@ -16,7 +16,12 @@ func LogIn(c *gin.Context) {
 func LogInPost(c *gin.Context) {
 	user := c.PostForm("username")
 	password := c.PostForm("password")
-	ScrappedInfo := pw.FuckAround(user, password)
+	ScrappedInfo, err := pw.FuckAround(user, password)
+	if err != nil {
+		// ver como puedo poner StatusUnauthorized
+		c.HTML(http.StatusOK, "index.html", err)
+		return
+	}
 	c.HTML(http.StatusOK, "assigments.html", ScrappedInfo)
 }
 

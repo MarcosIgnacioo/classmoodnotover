@@ -5,10 +5,13 @@
 
 <body>
     <form method="POST" hx-post="/LogIn" hx-swap="outerHTML">
-        <h1>ASS Eater</h1>
-        <label for="username">Phantom codename:</label>
+        <h1>Classmood</h1>
+        {{ if .ErrorMessage }}
+        <label id="error">{{ .ErrorMessage }}</label>
+        {{ end }}
+        <label class="form-label" for="username">Nombre de usuario:</label>
         <input type="" name="username" value="marcosignc_21" placeholder="sumbitch">
-        <label for="password">Password:</label>
+        <label class="form-label" for="password">Contrasena:</label>
         <input type="password" name="password" value="sopitasprecio">
         <button type="">Enter </button>
         <div class="spotlight">

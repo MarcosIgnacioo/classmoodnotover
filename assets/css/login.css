@@ -1,6 +1,20 @@
 :root{
     --spotlightPos: 45% 
 }
+
+@font-face {
+    font-family: 'Hat';
+    src: url('../fonts/hat.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'P5M';
+    src: url('../fonts/Persona5MenuFontPrototype-Regular.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Hatty';
+    src: url('../fonts/p5hatty-1.ttf') format('truetype');
+}
+
 @font-face {
     font-family: 'PUX';
     src: url('../fonts/PersonifiedUXRegular.ttf') format('truetype');
@@ -28,7 +42,7 @@
 }
 html{
     color:snow;
-    font-family: 'PUX', Arial;
+    font-family: 'Hat', Arial;
     background: hsl(0, 0%, 6%);
 }
 
@@ -58,8 +72,30 @@ h1{
     text-align: center;
 }
 
+a {
+    cursor: pointer;
+    text-align: center;
+    font-family: "EW";
+    font-size: 6rem;
+    font-style: none;
+    color: snow;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #DB3754;
+}
+
+
+.form-label {
+    font-family: 'PUX', Arial;
+    font-style:normal;
+}
 
 label {
+    font-family: Arial;
+    font-weight: bold;
+    font-style: italic;
     font-size: 3rem;
 }
 
@@ -87,13 +123,51 @@ button:hover, button:active{
 
 .assigments {
     display: flex;
+    flex-direction: column;
 }
 .assigment {
+    padding: 2%;
+    border-radius: 10px;
+    justify-content: center;
+    align-items: center;
+    box-shadow: hsl(0, 0%, 6%);
+    display: flex;
+    flex-direction: column;
     margin-top: 5%;
     font-size: 1rem;
-    width: 50%;
+    width: 70%;
     height: 100%;
-    background-color: red;
+    background: radial-gradient(circle, #131212, #141313,#131212, #141313 , #131212, #141313,#131212, #141313 , #131212, #141313,#131212, #141313 , #131212, #141313,#131212, #141313 , #131212, #141313,#131212, #141313 );
+}
+.classroom-assigments {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.moodle-assigments{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.assigment-subject {
+    text-align: center;
+    color:#EAA25F;
+    font-size: 4rem;
+}
+.assigment-content{
+    font-size: 4rem;
+    font-style: normal;
+    width: 80%;
+    text-align: left;
+}
+#error {
+    color: #DB3754;
+}
+.title {
+    text-align: left;
 }
 @keyframes spotLightAnimation {
     0% {
