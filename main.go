@@ -21,5 +21,4 @@ func main() {
 		port = "3030"
 	}
 	r.Run("0.0.0.0:" + port)
-	// pw.FuckAround("marcosignc_21", "sopitasprecio")
 }
