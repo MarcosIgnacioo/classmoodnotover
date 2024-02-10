@@ -5,6 +5,9 @@
 
 <body>
     <form method="POST" hx-post="/LogIn" hx-swap="outerHTML">
+        <div class="htmx-indicator">
+            <img src="../assets/icons/m5.gif" alt="">
+        </div>
         <h1>Classmood</h1>
         {{ if .ErrorMessage }}
         <label id="error">{{ .ErrorMessage }}</label>

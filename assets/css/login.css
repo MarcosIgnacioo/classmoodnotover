@@ -157,6 +157,33 @@ button:hover, button:active{
     color:#EAA25F;
     font-size: 4rem;
 }
+.htmx-indicator {
+    display: none;
+}
+.htmx-request input{
+    display: none;
+}
+
+.htmx-request h1{
+    display: none;
+}
+
+.htmx-request label{
+    display: none;
+}
+.htmx-request button{
+    display: none;
+}
+
+.htmx-request .spotlight{
+    display: none;
+}
+.htmx-request .htmx-indicator{
+    display: block !important;
+}
+.htmx-request.htmx-indicator{
+    display: block !important;
+}
 .assigment-content{
     font-size: 4rem;
     font-style: normal;
@@ -167,6 +194,7 @@ button:hover, button:active{
     color: #DB3754;
 }
 .title {
+    color:#DB3754; 
     text-align: left;
 }
 @keyframes spotLightAnimation {
