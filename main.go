@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/MarcosIgnacioo/classmoodls/controllers"
 	"github.com/gin-gonic/gin"
-	"os"
 )
 
 func main() {
@@ -15,9 +17,10 @@ func main() {
 	r.POST("/LogIn", controllers.LogInPost)
 	port := os.Getenv("STATE")
 	if port == "dev" {
+		fmt.Println("dev")
 		port = "3000"
 	} else {
-		gin.SetMode(gin.ReleaseMode)
+		fmt.Println("prod")
 		port = "3030"
 	}
 	r.Run("0.0.0.0:" + port)
