@@ -1,23 +1,19 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
-
 	"github.com/MarcosIgnacioo/classmoodls/controllers"
 	"github.com/gin-gonic/gin"
+	"os"
+	"os/exec"
 )
 
 func main() {
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		fmt.Println("error con path")
-		return
-	}
+	exec.Command("/bin/pwd")
+	exec.Command("/bin/chmod", "+x run.sh")
+	exec.Command("/bin/bash", "./run.sh")
 	r := gin.Default()
-	r.LoadHTMLGlob(dir + "public/templates/*")
-	r.Static("/assets", dir+"/assets")
+	r.LoadHTMLGlob("./public/templates/*")
+	r.Static("/assets", "../assets")
 	r.GET("/", controllers.LogIn)
 	r.GET("/wa", controllers.Test)
 	r.POST("/LogIn", controllers.LogInPost)
