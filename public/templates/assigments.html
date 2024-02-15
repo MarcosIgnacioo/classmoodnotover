@@ -3,7 +3,9 @@
         <h1 class="title">Classroom desires</h1>
         {{ range .ClassRoom }}
         <div class="assigment">
-            <label class="assigment-subject" for=""> {{ . }} </label>
+            <label for="" class="assigment-subject"> {{ .ClassSubject }} </label>
+            <p class="assigment-content"> {{ .Title }} </p>
+            <a href="{{ .Link }}"> Ver</a>
         </div>
         {{ end }}
     </div>
