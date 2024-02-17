@@ -1,4 +1,4 @@
-name lint go code
+name: lint go code
 
 on:
   push:
